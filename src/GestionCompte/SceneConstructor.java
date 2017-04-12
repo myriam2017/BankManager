@@ -1,4 +1,4 @@
-package sample;
+package GestionCompte;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -25,9 +25,6 @@ import javafx.stage.Stage;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Objects;
-import java.util.function.Consumer;
 
 /**
  * Created by Nefast on 28/03/2017.

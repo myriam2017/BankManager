@@ -1,4 +1,4 @@
-package sample;
+package GestionCompte;
 
 /**
  * Created by Nefast on 10/04/2017.
@@ -19,7 +19,7 @@ public class Client {
         this.password = password;
         this.admin = admin;
     }
-    
+
     public int getId() {
         return id;
     }
