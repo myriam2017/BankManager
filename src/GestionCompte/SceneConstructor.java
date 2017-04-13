@@ -46,7 +46,6 @@ public class SceneConstructor {
     private GridPane grid;
     private ChoiceBox cbTypePay, cbType,cbCate,cbSubCate,cbClient;
     private Stage thestage;
-    private Group group;
     private TableView table;
     private VBox vbox;
     private DatePicker dpCreated;
@@ -231,6 +230,7 @@ public class SceneConstructor {
                         this.textFieldUsername.getText(),
                         this.cbClient.getSelectionModel().getSelectedItem().toString()
                 );
+                System.out.println("Je rentre pl");
                 this.thestage.setScene(this.listComptePage());
             }catch (Exception ex){
                 this.thestage.setScene(this.addComptePage(ex.getMessage()));
@@ -807,14 +807,14 @@ public class SceneConstructor {
         this.label = new Label("Type:");
         this.grid.add(this.label, 0, 2);
         this.cbType = new ChoiceBox(FXCollections.observableArrayList(
-                "Depense", "Revenue", "Echéance Automatique")
+                "Depense", "Revenue")
         );
         this.grid.add(this.cbType, 1, 2);
 
         this.label = new Label("Type paiement");
         this.grid.add(this.label, 0, 3);
         this.cbTypePay = new ChoiceBox(FXCollections.observableArrayList(
-                "Virement", "Espece", "Retrait", "Cheque")
+                "Virement", "Espece", "Retrait", "Cheque", "CB")
         );
         this.grid.add(this.cbTypePay, 1, 3);
 
@@ -1275,24 +1275,24 @@ public class SceneConstructor {
         this.grid.add(this.label, 0, 1);
         this.textFieldLastname = new TextField();
         this.textFieldLastname.setText(client.getLastName());
-        this.grid.add(this.textFieldLastname, 1, 1);
+        this.grid.add(this.textFieldLastname, 1, 1, 2, 1);
 
         this.label = new Label("Prenom:");
         this.grid.add(this.label, 0, 2);
         this.textFieldFirstname = new TextField();
         this.textFieldFirstname.setText(client.getFirstName());
-        this.grid.add(this.textFieldFirstname, 1, 2);
+        this.grid.add(this.textFieldFirstname, 1, 2, 2, 1);
 
         this.label = new Label("Surnom:");
         this.grid.add(this.label, 0, 3);
         this.textFieldUsername = new TextField();
         this.textFieldUsername.setText(client.getUserName());
-        this.grid.add(this.textFieldUsername, 1, 3);
+        this.grid.add(this.textFieldUsername, 1, 3, 2, 1);
 
         this.label = new Label("Mot de passe:");
         this.grid.add(this.label, 0, 4);
         this.passField = new PasswordField();
-        this.grid.add(this.passField, 1, 4);
+        this.grid.add(this.passField, 1, 4, 2, 1);
 
         this.label = new Label("Admin:");
         this.grid.add(this.label, 0, 5);
@@ -1301,7 +1301,7 @@ public class SceneConstructor {
         }else {
             this.checkBoxIsAdmin.setSelected(false);
         }
-        this.grid.add(this.checkBoxIsAdmin, 1, 5);
+        this.grid.add(this.checkBoxIsAdmin, 1, 5, 2, 1);
 
 
         this.hbox = new HBox(10);
@@ -1312,8 +1312,14 @@ public class SceneConstructor {
 
         this.hbox = new HBox(10);
         this.hbox.setAlignment(Pos.BOTTOM_RIGHT);
-        this.hbox.getChildren().add(this.btnSaveClient);
+        this.hbox.getChildren().add(this.btnDeleteClient);
         this.grid.add(this.hbox, 1, 6);
+        this.btnDeleteClient.setOnAction(this::ButtonClicked);
+
+        this.hbox = new HBox(10);
+        this.hbox.setAlignment(Pos.BOTTOM_RIGHT);
+        this.hbox.getChildren().add(this.btnSaveClient);
+        this.grid.add(this.hbox, 2, 6);
         this.btnSaveClient.setOnAction(this::ButtonClicked);
 
         return this.scene;
@@ -1343,8 +1349,8 @@ public class SceneConstructor {
 
         this.label = new Label("Nom d'utilisateur:");
         this.grid.add(this.label, 0, 1);
-        this.textFieldLastname = new TextField();
-        this.grid.add(this.textFieldLastname, 1, 1);
+        this.textFieldUsername = new TextField();
+        this.grid.add(this.textFieldUsername, 1, 1);
 
         this.label = new Label("Client");
         this.grid.add(this.label, 0, 2);
@@ -1391,13 +1397,13 @@ public class SceneConstructor {
         
         this.scenetitle = new Text("Ajouter un compte");
         this.scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
-        this.grid.add(this.scenetitle, 0, 0, 2, 1);
+        this.grid.add(this.scenetitle, 0, 0, 3, 1);
 
         this.label = new Label("Nom d'utilisateur:");
         this.grid.add(this.label, 0, 1);
         this.textFieldLastname = new TextField();
         this.textFieldLastname.setText(compte.getUserName());
-        this.grid.add(this.textFieldLastname, 1, 1);
+        this.grid.add(this.textFieldLastname, 1, 1, 2, 1);
 
         this.label = new Label("Client");
         this.grid.add(this.label, 0, 2);
@@ -1418,8 +1424,14 @@ public class SceneConstructor {
         this.hbox = new HBox(10);
         this.hbox.setAlignment(Pos.BOTTOM_RIGHT);
         this.hbox.getChildren().add(this.btnSaveCompte);
-        this.grid.add(this.hbox, 1, 3);
+        this.grid.add(this.hbox, 2, 3);
         this.btnSaveCompte.setOnAction(this::ButtonClicked);
+
+        this.hbox = new HBox(10);
+        this.hbox.setAlignment(Pos.BOTTOM_RIGHT);
+        this.hbox.getChildren().add(this.btnDeleteCompte);
+        this.grid.add(this.hbox, 1, 3);
+        this.btnDeleteCompte.setOnAction(this::ButtonClicked);
 
         return this.scene;
     }

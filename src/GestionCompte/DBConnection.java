@@ -450,7 +450,6 @@ public class DBConnection {
                         rs.getString("username"),
                         this.getOneClient("id", String.valueOf(rs.getInt("id_client")))
                 );
-                System.out.println(this.compte);
                 comptes.add(this.compte);
             }
         }catch (Exception e){
@@ -655,7 +654,6 @@ public class DBConnection {
     public void setOperation(String name, String description, String type, String payType, String subCategorie, LocalDate created_at, String amount,  String poste) throws Exception {
         java.sql.Statement statement = null;
         try{
-            System.out.println(subCategorie);
             statement = this.conn.createStatement();
             LocalDateTime now = LocalDateTime.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -666,7 +664,6 @@ public class DBConnection {
             String sql = "INSERT INTO `operation` (`id`, `id_compte`, `name`, `description`, `type`, `payment_type`, `categorie`, `sous_categorie`, `created_at`, `updated_at`, `amount`, `poste`)\n" +
                     "VALUES\n" +
                     "\t(DEFAULT, " + this.connectedCompte.getId() + ", '"+ name +"' , '"+ description +"' , '"+ type +"' , '"+ payType +"', "+ cateO.getId() +", "+ subCateO.getId() +", '" + dateFormatCreated + "', '" + dateFormatUpdated + "', " + amount + ", '" + poste + "');\n";
-            System.out.println(sql);
 
             statement.executeUpdate(sql);
 
@@ -745,12 +742,16 @@ public class DBConnection {
 
     public void setCompte(String username, String client) throws Exception {
         java.sql.Statement statement = null;
+        System.out.println("oook");
         try{
             statement = this.conn.createStatement();
-            Client client1 = this.getOneClient("username", "\"" + client + "\"");
+            System.out.println("oook");
+            Client client1 = this.getOneClient("username",  client);
+            System.out.println(client1);
             String sql = "INSERT INTO `compte` (`id`, `id_client`, `username`)\n" +
                     "VALUES\n" +
                     "\t(DEFAULT, "+client1.getId()+", '"+username+"');\n";
+            System.out.println(sql);
             statement.executeUpdate(sql);
         }catch (Exception e){
             throw new Exception(e);
