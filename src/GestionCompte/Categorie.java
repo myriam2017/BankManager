@@ -3,7 +3,7 @@ package GestionCompte;
 import javafx.beans.property.SimpleStringProperty;
 
 /**
- * Created by Nefast on 29/03/2017.
+ * Created by Nejoua & Myriam on 29/03/2017.
  */
 public class Categorie {
 

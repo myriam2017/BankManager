@@ -10,11 +10,9 @@ public class Main extends Application {
     private SceneConstructor sc;
     private GridPane grid;
     private DBConnection dbConnection;
-    private BankManager bankManager;
 
     public Main() throws Exception {
         this.dbConnection = new DBConnection();
-        this.bankManager = new BankManager(dbConnection);
     }
 
     @Override
@@ -22,7 +20,7 @@ public class Main extends Application {
         stage.setWidth(600);
         stage.setHeight(600);
 
-        this.sc = new SceneConstructor(stage, this.dbConnection, this.bankManager);
+        this.sc = new SceneConstructor(stage, this.dbConnection);
         Scene scene = this.sc.connectingPage();
         stage.setScene(scene);
         stage.show();

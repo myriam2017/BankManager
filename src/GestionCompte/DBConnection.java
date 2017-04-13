@@ -21,6 +21,8 @@ public class DBConnection {
     private String password;
     private String client;
     private String clientPassword;
+    private Client clientPop;
+    private Compte compte;
     private Properties props;
     private Connection conn;
     private Operation operation;
@@ -29,7 +31,7 @@ public class DBConnection {
     private Client connectedClient;
     private Compte connectedCompte;
 
-    public DBConnection(){
+    public DBConnection() throws Exception {
         this.dbDriver = "com.mysql.jdbc.Driver";
         this.dbUrl = "jdbc:mysql://localhost";
         this.user = "root";
@@ -37,6 +39,10 @@ public class DBConnection {
         this.operation = null;
         this.categorie = null;
         this.subCategorie = null;
+
+        this.setProperties();
+        this.getSQLConnection();
+        this.initDatatable();
     }
 
     public String hashingPass256(String password) throws NoSuchAlgorithmException {
@@ -74,10 +80,6 @@ public class DBConnection {
             this.client = user;
             this.clientPassword = pwd;
             this.userAccount = userAccount;
-
-            this.setProperties();
-            this.getSQLConnection();
-            this.initDatatable();
 
             this.connectedClient = this.getOneClient("username", user);
             if (this.connectedClient == null){
@@ -404,6 +406,66 @@ public class DBConnection {
         return categories;
     }
 
+    public ObservableList<Client> getAllClient() throws Exception{
+        ObservableList<Client> clients = FXCollections.observableArrayList();
+        java.sql.Statement statement = null;
+        try{
+            statement = this.conn.createStatement();
+            String sql = "SELECT * FROM `client`";
+            ResultSet rs = statement.executeQuery(sql);
+            while (rs.next()) {
+                this.clientPop = new Client(
+                        rs.getInt("id"),
+                        rs.getString("firstname"),
+                        rs.getString("lastname"),
+                        rs.getString("username"),
+                        rs.getString("password"),
+                        rs.getInt("id")
+                );
+                clients.add(this.clientPop);
+            }
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }finally{
+            try{
+                if(statement != null)
+                    statement.close();
+            }catch(Exception e){
+                System.out.println(e.getMessage());
+            }
+        }
+        return clients;
+    }
+
+    public ObservableList<Compte> getAllCompte() throws Exception{
+        ObservableList<Compte> comptes = FXCollections.observableArrayList();
+        java.sql.Statement statement = null;
+        try{
+            statement = this.conn.createStatement();
+            String sql = "SELECT * FROM `compte`";
+            ResultSet rs = statement.executeQuery(sql);
+            while (rs.next()) {
+                this.compte = new Compte(
+                        rs.getInt("id"),
+                        rs.getString("username"),
+                        this.getOneClient("id", String.valueOf(rs.getInt("id_client")))
+                );
+                System.out.println(this.compte);
+                comptes.add(this.compte);
+            }
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }finally{
+            try{
+                if(statement != null)
+                    statement.close();
+            }catch(Exception e){
+                System.out.println(e.getMessage());
+            }
+        }
+        return comptes;
+    }
+
     public ObservableList<SubCategorie> getAllSubCategory() throws Exception{
         ObservableList<SubCategorie> subCategories = FXCollections.observableArrayList();
         java.sql.Statement statement = null;
@@ -567,6 +629,29 @@ public class DBConnection {
         return subCategories;
     }
 
+    public ObservableList getAllSubClientChoice() throws Exception{
+        ObservableList comptes = FXCollections.observableArrayList();
+        java.sql.Statement statement = null;
+        try{
+            statement = this.conn.createStatement();
+            String sql = "SELECT * FROM `client`";
+            ResultSet rs = statement.executeQuery(sql);
+            while (rs.next()) {
+                comptes.add(rs.getString("username"));
+            }
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }finally{
+            try{
+                if(statement != null)
+                    statement.close();
+            }catch(Exception e){
+                System.out.println(e.getMessage());
+            }
+        }
+        return comptes;
+    }
+
     public void setOperation(String name, String description, String type, String payType, String subCategorie, LocalDate created_at, String amount,  String poste) throws Exception {
         java.sql.Statement statement = null;
         try{
@@ -638,6 +723,47 @@ public class DBConnection {
         }
     }
 
+    public void setClient(String firstname, String lastname, String username, String password, int admin) throws Exception {
+        java.sql.Statement statement = null;
+        try{
+            statement = this.conn.createStatement();
+            String sql = "INSERT INTO `client` (`id`, `firstname`, `lastname`, `username`, `password`, `is_admin`)\n" +
+                    "VALUES\n" +
+                    "\t(DEFAULT, '"+firstname+"', '"+lastname+"', '"+username+"', '"+this.hashingPass256(password)+"', "+admin+");\n";
+            statement.executeUpdate(sql);
+        }catch (Exception e){
+            throw new Exception(e);
+        }finally{
+            try{
+                if(statement != null)
+                    statement.close();
+            }catch(Exception e){
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+    public void setCompte(String username, String client) throws Exception {
+        java.sql.Statement statement = null;
+        try{
+            statement = this.conn.createStatement();
+            Client client1 = this.getOneClient("username", "\"" + client + "\"");
+            String sql = "INSERT INTO `compte` (`id`, `id_client`, `username`)\n" +
+                    "VALUES\n" +
+                    "\t(DEFAULT, "+client1.getId()+", '"+username+"');\n";
+            statement.executeUpdate(sql);
+        }catch (Exception e){
+            throw new Exception(e);
+        }finally{
+            try{
+                if(statement != null)
+                    statement.close();
+            }catch(Exception e){
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
     public void setOperation(int id, String name, String description, String type, String payType, String subCategorie, LocalDate created_at, String amount,  String poste) throws Exception {
         java.sql.Statement statement = null;
         try{
@@ -690,6 +816,45 @@ public class DBConnection {
         try{
             statement = this.conn.createStatement();
             String sql = "UPDATE `categorie` SET id='"+ id + "', name='" + name + "' WHERE id="+ id;
+            statement.executeUpdate(sql);
+        }catch (Exception e){
+            throw new Exception(e);
+        }finally{
+            try{
+                if(statement != null)
+                    statement.close();
+            }catch(Exception e){
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+    public void setClient(int id, String firstname, String lastname, String username, String password, int admin) throws Exception {
+        java.sql.Statement statement = null;
+        try{
+            statement = this.conn.createStatement();
+            String sql = "UPDATE `client` SET id='"+ id + "', firstname='" + firstname + "', lastname='" + lastname + ", username='" + username + ", password='" + password + ", is_admin='" + admin + " WHERE id="+ id;
+            System.out.println(sql);
+            statement.executeUpdate(sql);
+        }catch (Exception e){
+            throw new Exception(e);
+        }finally{
+            try{
+                if(statement != null)
+                    statement.close();
+            }catch(Exception e){
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+    public void setCompte(int id, String username, String client) throws Exception {
+        java.sql.Statement statement = null;
+        try{
+            Client client1 = this.getOneClient("username", "\"" + client + "\"");
+            statement = this.conn.createStatement();
+            String sql = "UPDATE `compte` SET id='"+ id + "', username='" + username + "', id_client='" + client1.getId() + " WHERE id="+ id;
+            System.out.println(sql);
             statement.executeUpdate(sql);
         }catch (Exception e){
             throw new Exception(e);
@@ -777,6 +942,45 @@ public class DBConnection {
             }
         }
     }
+
+    public void deleteClient(int id) throws Exception {
+        java.sql.Statement statement = null;
+        try{
+            statement = this.conn.createStatement();
+
+            String sql = "DELETE FROM `client` WHERE id="+id;
+            statement.executeUpdate(sql);
+        }catch (Exception e){
+            throw new Exception(e);
+        }finally{
+            try{
+                if(statement != null)
+                    statement.close();
+            }catch(Exception e){
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+    public void deleteCompte(int id) throws Exception {
+        java.sql.Statement statement = null;
+        try{
+            statement = this.conn.createStatement();
+
+            String sql = "DELETE FROM `compte` WHERE id="+id;
+            statement.executeUpdate(sql);
+        }catch (Exception e){
+            throw new Exception(e);
+        }finally{
+            try{
+                if(statement != null)
+                    statement.close();
+            }catch(Exception e){
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
 
     public static String ucfirst(String chaine){
         return chaine.substring(0, 1).toUpperCase()+ chaine.substring(1).toLowerCase();
