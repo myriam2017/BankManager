@@ -25,6 +25,8 @@ import javafx.stage.Stage;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Nejoua & Myriam on 28/03/2017.
@@ -33,9 +35,10 @@ public class SceneConstructor {
 
     /* Manager */
     private DBConnection dbc;
+    private ExportData exportData;
 
     /* Field and button */
-    private Button btnDeleteOperation, btnDeleteCategory, btnDeleteSubCategory, btnBilan, btnConnexion, btnDeconnexion, btnAddOperation, btnEditOperation,  btnListOperation, btnSaveOperation, btnAddCategory, btnEditCategory, btnSaveCategory, btnListCategory, btnAddSubCategory, btnSaveSubCategory, btnEditSubCategory, btnListSubCategory, btnAddClient, btnSaveClient, btnEditClient, btnListClient, btnDeleteClient, btnAddCompte, btnSaveCompte, btnEditCompte, btnListCompte, btnDeleteCompte;
+    private Button btnDeleteOperation, btnDeleteCategory, btnDeleteSubCategory, btnBilan, btnConnexion, btnDeconnexion, btnAddOperation, btnEditOperation,  btnListOperation, btnSaveOperation, btnAddCategory, btnEditCategory, btnSaveCategory, btnListCategory, btnAddSubCategory, btnSaveSubCategory, btnEditSubCategory, btnListSubCategory, btnAddClient, btnSaveClient, btnEditClient, btnListClient, btnDeleteClient, btnAddCompte, btnSaveCompte, btnEditCompte, btnListCompte, btnDeleteCompte, btnExportOperation, btnExportCategorie , btnExportSubCate, btnExportClient, btnExportCompte ;
     private Text scenetitle;
     private Label label;
     private TextField textFieldFirstname, textFieldLastname, textFieldNameOperation, textFieldNameCate, textFieldUser, textFieldUserAccount, textFieldOpType, textFieldAmount, textFieldPoste;
@@ -95,7 +98,13 @@ public class SceneConstructor {
         this.btnEditCompte = new Button("Enregistrer");
         this.btnSaveCompte = new Button("Enregistrer");
         this.btnDeleteCompte = new Button("Supprimer");
-        
+
+        this.btnExportOperation = new Button("CSV");
+        this.btnExportCategorie = new Button("CSV");
+        this.btnExportSubCate = new Button("CSV");
+        this.btnExportClient = new Button("CSV");
+        this.btnExportCompte = new Button("CSV");
+
         this.thestage = stage;
 
         this.textFieldNameOperation = new TextField();
@@ -112,6 +121,8 @@ public class SceneConstructor {
         this.cbSubCate = new ChoiceBox();
 
         this.checkBoxIsAdmin = new CheckBox();
+
+        this.exportData = new ExportData(this.dbc);
     }
 
     public void checkDatabase() throws Exception {
@@ -345,6 +356,26 @@ public class SceneConstructor {
                 this.thestage.setScene(this.editComptePage(this.rowDataCompte, ex.getMessage()));
             }
         }
+        else if (e.getSource()==this.btnExportClient){
+            ArrayList<List<String>> export = this.dbc.getClientCsv();
+            this.exportData.exportHasCsv("client", export);
+        }
+        else if (e.getSource()==this.btnExportOperation){
+            ArrayList<List<String>> export = this.dbc.getOperationCsv();
+            this.exportData.exportHasCsv("operation", export);
+        }
+        else if (e.getSource()==this.btnExportCompte){
+            ArrayList<List<String>> export = this.dbc.getCompteCsv();
+            this.exportData.exportHasCsv("compte", export);
+        }
+        else if (e.getSource()==this.btnExportCategorie){
+            ArrayList<List<String>> export = this.dbc.getCategorieCsv();
+            this.exportData.exportHasCsv("categorie", export);
+        }
+        else if (e.getSource()==this.btnExportSubCate){
+            ArrayList<List<String>> export = this.dbc.getSubCategorieCsv();
+            this.exportData.exportHasCsv("sous-categorie", export);
+        }
     }
 
     public void initGrid(){
@@ -489,10 +520,16 @@ public class SceneConstructor {
         this.btnBilan.setOnAction(this::ButtonClicked);
 
         this.hbox = new HBox(20);
-        this.hbox.setAlignment(Pos.CENTER_RIGHT);
+        this.hbox.setAlignment(Pos.CENTER);
         this.hbox.getChildren().add(this.btnAddOperation);
         this.grid.add(this.hbox, 1, 1);
         this.btnAddOperation.setOnAction(this::ButtonClicked);
+
+        this.hbox = new HBox(20);
+        this.hbox.setAlignment(Pos.CENTER_RIGHT);
+        this.hbox.getChildren().add(this.btnExportOperation);
+        this.grid.add(this.hbox, 2, 1);
+        this.btnExportOperation.setOnAction(this::ButtonClicked);
 
         this.table = new TableView();
 
@@ -567,6 +604,12 @@ public class SceneConstructor {
         this.grid.add(this.hbox, 1, 1);
         this.btnAddCategory.setOnAction(this::ButtonClicked);
 
+        this.hbox = new HBox(20);
+        this.hbox.setAlignment(Pos.CENTER_RIGHT);
+        this.hbox.getChildren().add(this.btnExportCategorie);
+        this.grid.add(this.hbox, 2, 1);
+        this.btnExportCategorie.setOnAction(this::ButtonClicked);
+
         this.table = new TableView();
         ObservableList<Categorie> data = null;
         try {
@@ -621,6 +664,12 @@ public class SceneConstructor {
         this.hbox.getChildren().add(this.btnAddClient);
         this.grid.add(this.hbox, 1, 1);
         this.btnAddClient.setOnAction(this::ButtonClicked);
+
+        this.hbox = new HBox(20);
+        this.hbox.setAlignment(Pos.CENTER_RIGHT);
+        this.hbox.getChildren().add(this.btnExportClient);
+        this.grid.add(this.hbox, 2, 1);
+        this.btnExportClient.setOnAction(this::ButtonClicked);
 
         this.table = new TableView();
         ObservableList<Client> data = null;
@@ -687,6 +736,12 @@ public class SceneConstructor {
         this.grid.add(this.hbox, 1, 1);
         this.btnAddCompte.setOnAction(this::ButtonClicked);
 
+        this.hbox = new HBox(20);
+        this.hbox.setAlignment(Pos.CENTER_RIGHT);
+        this.hbox.getChildren().add(this.btnExportCompte);
+        this.grid.add(this.hbox, 2, 1);
+        this.btnExportCompte.setOnAction(this::ButtonClicked);
+
         this.table = new TableView();
         ObservableList<Compte> data = null;
         try {
@@ -745,6 +800,12 @@ public class SceneConstructor {
         this.hbox.getChildren().add(this.btnAddSubCategory);
         this.grid.add(this.hbox, 1, 0);
         this.btnAddSubCategory.setOnAction(this::ButtonClicked);
+
+        this.hbox = new HBox(20);
+        this.hbox.setAlignment(Pos.CENTER_RIGHT);
+        this.hbox.getChildren().add(this.btnExportSubCate);
+        this.grid.add(this.hbox, 2, 1);
+        this.btnExportSubCate.setOnAction(this::ButtonClicked);
 
         this.table = new TableView();
 

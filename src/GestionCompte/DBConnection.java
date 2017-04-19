@@ -1,5 +1,6 @@
 package GestionCompte;
 
+import com.sun.tools.javac.util.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.chart.PieChart;
@@ -11,6 +12,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.List;
 
 public class DBConnection {
 
@@ -982,6 +984,199 @@ public class DBConnection {
         }
     }
 
+    public ArrayList<List<String>> getOperationCsv(){
+        ArrayList<List<String>> export = new ArrayList<List<String>>();
+        List<String> data;
+        java.sql.Statement statement = null;
+
+        data = new ArrayList<String>();
+        data.add("id");
+        data.add("name");
+        data.add("description");
+        data.add("type");
+        data.add("payment_type");
+        data.add("categorie");
+        data.add("sous_categorie");
+        data.add("created_at");
+        data.add("updated_at");
+        data.add("amount");
+        data.add("poste");
+
+        export.add(data);
+
+        try{
+            statement = this.conn.createStatement();
+            String sql = "SELECT * FROM `operation` WHERE id_compte = " + this.connectedCompte.getId();
+            ResultSet rs = statement.executeQuery(sql);
+            while (rs.next()) {
+                data = new ArrayList<String>();
+                data.add(String.valueOf(rs.getInt("id")));
+                data.add(rs.getString("name"));
+                data.add(rs.getString("description"));
+                data.add(rs.getString("type"));
+                data.add(rs.getString("payment_type"));
+                data.add(String.valueOf(rs.getInt("categorie")));
+                data.add(String.valueOf(rs.getInt("sous_categorie")));
+                data.add(String.valueOf(rs.getDate("created_at")));
+                data.add(String.valueOf(rs.getDate("updated_at")));
+                data.add(String.valueOf(rs.getFloat("amount")));
+                data.add(rs.getString("poste"));
+
+                export.add(data);
+            }
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }finally{
+            try{
+                if(statement != null)
+                    statement.close();
+            }catch(Exception e){
+                System.out.println(e.getMessage());
+            }
+        }
+        return export;
+    }
+
+    public ArrayList<List<String>> getCategorieCsv(){
+        ArrayList<List<String>> export = new ArrayList<List<String>>();
+        List<String> data;
+        java.sql.Statement statement = null;
+
+        try{
+            statement = this.conn.createStatement();
+            String sql = "SELECT * FROM `categorie` ";
+            ResultSet rs = statement.executeQuery(sql);
+            data = new ArrayList<String>();
+            data.add("id");
+            data.add("name");
+
+            export.add(data);
+            while (rs.next()) {
+                data = new ArrayList<String>();
+                data.add(String.valueOf(rs.getInt("id")));
+                data.add(rs.getString("name"));
+
+                export.add(data);
+            }
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }finally{
+            try{
+                if(statement != null)
+                    statement.close();
+            }catch(Exception e){
+                System.out.println(e.getMessage());
+            }
+        }
+        return export;
+    }
+
+    public ArrayList<List<String>> getSubCategorieCsv(){
+        ArrayList<List<String>> export = new ArrayList<List<String>>();
+        List<String> data;
+        java.sql.Statement statement = null;
+
+        try{
+            statement = this.conn.createStatement();
+            String sql = "SELECT * FROM `sous_categorie` ";
+            ResultSet rs = statement.executeQuery(sql);
+            data = new ArrayList<String>();
+            data.add("id");
+            data.add("name");
+            data.add("Categorie");
+
+            export.add(data);
+            while (rs.next()) {
+                data = new ArrayList<String>();
+                data.add(String.valueOf(rs.getInt("id")));
+                data.add(rs.getString("name"));
+                data.add(this.getOneCategory("id", String.valueOf(rs.getInt("categorie"))).getName());
+
+                export.add(data);
+            }
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }finally{
+            try{
+                if(statement != null)
+                    statement.close();
+            }catch(Exception e){
+                System.out.println(e.getMessage());
+            }
+        }
+        return export;
+    }
+
+    public ArrayList<List<String>> getClientCsv(){
+        ArrayList<List<String>> export = new ArrayList<List<String>>();
+        List<String> data;
+        java.sql.Statement statement = null;
+
+        try{
+            statement = this.conn.createStatement();
+            String sql = "SELECT * FROM `client` ";
+            ResultSet rs = statement.executeQuery(sql);
+            while (rs.next()) {
+                data = new ArrayList<String>();
+                data.add(String.valueOf(rs.getInt("id")));
+                data.add(rs.getString("firstname"));
+                data.add(rs.getString("lastname"));
+                data.add(rs.getString("username"));
+                String is_admin = (rs.getInt("is_admin") == 1) ? "Oui" : "Non";
+                data.add(is_admin);
+
+                export.add(data);
+            }
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }finally{
+            try{
+                if(statement != null)
+                    statement.close();
+            }catch(Exception e){
+                System.out.println(e.getMessage());
+            }
+        }
+        return export;
+    }
+
+    public ArrayList<List<String>> getCompteCsv(){
+        ArrayList<List<String>> export = new ArrayList<List<String>>();
+        List<String> data;
+        java.sql.Statement statement = null;
+
+        try{
+            statement = this.conn.createStatement();
+            String sql = "SELECT * FROM `compte` ";
+            data = new ArrayList<String>();
+
+            ResultSet rs = statement.executeQuery(sql);
+            data.add("id");
+            data.add("username");
+            data.add("client");
+
+            export.add(data);
+
+            while (rs.next()) {
+                data = new ArrayList<String>();
+                data.add(String.valueOf(rs.getInt("id")));
+                data.add(rs.getString("username"));
+                data.add(this.getOneCategory("id", String.valueOf(rs.getInt("id_client"))).getName());
+
+                export.add(data);
+            }
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }finally{
+            try{
+                if(statement != null)
+                    statement.close();
+            }catch(Exception e){
+                System.out.println(e.getMessage());
+            }
+        }
+        return export;
+    }
 
     public static String ucfirst(String chaine){
         return chaine.substring(0, 1).toUpperCase()+ chaine.substring(1).toLowerCase();
